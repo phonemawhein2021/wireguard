@@ -72,14 +72,15 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/create_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             android:nextFocusUp="@id/tunnel_list"
-            app:srcCompat="@drawable/ic_action_add_white" />
+            android:text="Generate"
+            android:onClick="@{() -> fragment.onGenerateClicked()}" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
