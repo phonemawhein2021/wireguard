@@ -66,8 +66,7 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_activity, menu)
-        return true
+        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
