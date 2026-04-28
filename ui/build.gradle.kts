@@ -1,22 +1,50 @@
+@file:Suppress("UnstableApiUsage")
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.legacy.kapt)
+}
+
 android {
-    // ... အခြား configuration များ ...
+    namespace = providers.gradleProperty("wireguardPackageName").get()
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = namespace
+        minSdk = 24
+        targetSdk = 35
+        versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
+        versionName = providers.gradleProperty("wireguardVersionName").get()
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = true // Code တွေကို ချုံ့ပေးတယ်
-            isShrinkResources = true // မသုံးတဲ့ Resource တွေကို ဖယ်ပေးတယ်
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            
-            signingConfig = signingConfigs.getByName("release") // Sign လုပ်ဖို့ ထည့်ပေးရမယ်
         }
     }
 
     splits {
         abi {
-            isEnable = true // ခွဲထုတ်ဖို့ ဖွင့်ပေးတာ
+            isEnable = true
             reset()
-            include("arm64-v8a", "armeabi-v7a") // ဒီနှစ်ခုပဲ ထုတ်မယ်
-            isUniversalApk = false // ဖိုင်အားလုံးပေါင်းထားတဲ့ ဖိုင်ကြီး မထုတ်ဘူး (Size သေးစေဖို့)
+            include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
         }
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
+    }
+}
+
+dependencies {
+    implementation(project(":tunnel"))
+    implementation(libs.androidx.appcompat)
+    implementation(libs.google.material)
+    // ကျန်တဲ့ implementation တွေကို အရင်ဖိုင်အတိုင်း ဆက်ထားပေးပါ
 }
