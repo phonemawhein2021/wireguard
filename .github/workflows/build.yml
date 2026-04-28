@@ -33,34 +33,32 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleRelease
 
-      - name: Sign and Organize APKs
+      - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
           mkdir -p final-apks
           
-          # ထွက်လာသမျှ APK အားလုံးကို ရှာပြီး Sign လုပ်မယ်
-          find ui/build/outputs/apk/release/ -name "*.apk" | while read apk; do
-            # ဖိုင်နာမည်ထဲမှာ arm64 ဒါမှမဟုတ် armv7 ပါတာကို ရှာမယ်
-            if [[ $apk == *"arm64-v8a"* ]]; then
+          # ထွက်လာတဲ့ unsigned apk တွေကို ရှာပြီး sign မယ်
+          find ui/build/outputs/apk/release/ -name "*-unsigned.apk" | while read apk; do
+            filename=$(basename "$apk")
+            if [[ $filename == *"arm64-v8a"* ]]; then
               abi="arm64-v8a"
-            elif [[ $apk == *"armeabi-v7a"* ]]; then
+            elif [[ $filename == *"armeabi-v7a"* ]]; then
               abi="armeabi-v7a"
             else
-              abi="unknown"
+              abi="universal"
             fi
             
-            if [ "$abi" != "unknown" ]; then
-              ${BUILD_TOOLS}/apksigner sign \
-                --ks phxvpn.keystore \
-                --ks-key-alias phxvpn \
-                --ks-pass pass:phxvpn123 \
-                --key-pass pass:phxvpn123 \
-                --out final-apks/PHX-VPN-${abi}.apk \
-                "$apk"
-            fi
+            ${BUILD_TOOLS}/apksigner sign \
+              --ks phxvpn.keystore \
+              --ks-key-alias phxvpn \
+              --ks-pass pass:phxvpn123 \
+              --key-pass pass:phxvpn123 \
+              --out final-apks/PHX-VPN-${abi}.apk \
+              "$apk"
           done
 
-      - name: Upload APKs
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: PHX-VPN-Release
