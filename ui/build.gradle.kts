@@ -1,6 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
-// အရေးကြီးဆုံးအပိုင်း- ဒီ plugins block က အပေါ်ဆုံးမှာ ရှိရပါမယ်
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -8,7 +5,6 @@ plugins {
 }
 
 android {
-    // ၎င်း namespace သည် သင့် app ၏ မူရင်း package name ဖြစ်ရပါမည်
     namespace = providers.gradleProperty("wireguardPackageName").get()
     compileSdk = 35
 
@@ -52,9 +48,12 @@ android {
 
 dependencies {
     implementation(project(":tunnel"))
-    // အောက်ပါတို့သည် အခြေခံ library များဖြစ်သည်၊ သင့်မူရင်းဖိုင်ထဲက dependencies များကိုလည်း ဒီအောက်မှာ ဆက်ထည့်နိုင်သည်
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    // အခြေခံလိုအပ်သော Library များ (ဗားရှင်းများကို လက်ရှိ Runner နှင့် ကိုက်အောင် ထည့်ပေးထားသည်)
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("androidx.core:core-ktx:1.12.0")
+    
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
