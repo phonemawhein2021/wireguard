@@ -1,12 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
+// ၁။ ဒီ Plugins block က အသက်ပဲ၊ ဒါမှ android ဆိုတာကို သိမှာပါ
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.legacy.kapt)
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
 }
 
 android {
+    // သင့် app ရဲ့ package name ကို providers ကနေ ဆွဲယူမယ်
     namespace = providers.gradleProperty("wireguardPackageName").get()
     compileSdk = 35
 
@@ -16,6 +18,8 @@ android {
         targetSdk = 35
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
+        
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -26,6 +30,7 @@ android {
         }
     }
 
+    // ၂။ arm64 နဲ့ armv7 ခွဲထုတ်တဲ့အပိုင်း
     splits {
         abi {
             isEnable = true
@@ -40,11 +45,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
+
+    buildFeatures {
+        buildConfig = true
+        dataBinding = true
+        viewBinding = true
+    }
 }
 
 dependencies {
     implementation(project(":tunnel"))
-    implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
-    // ကျန်တဲ့ implementation တွေကို အရင်ဖိုင်အတိုင်း ဆက်ထားပေးပါ
+    // ကျန်တဲ့ implementation library များကို သင့်မူရင်းဖိုင်အတိုင်း ဒီအောက်မှာ ဆက်ထည့်ပေးပါ
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
