@@ -34,26 +34,19 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
-      - name: Zipalign APK
+      - name: Sign and align APK
         run: |
-          ${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)/zipalign \
-            -v 4 \
-            ui/build/outputs/apk/release/ui-release-unsigned.apk \
-            ui/build/outputs/apk/release/ui-release-aligned.apk
-
-      - name: Sign APK
-        run: |
-          jarsigner -verbose \
-            -sigalg SHA256withRSA \
-            -digestalg SHA-256 \
-            -keystore phxvpn.keystore \
-            -storepass phxvpn123 \
-            -keypass phxvpn123 \
-            ui/build/outputs/apk/release/ui-release-aligned.apk \
-            phxvpn
+          BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
+          ${BUILD_TOOLS}/apksigner sign \
+            --ks phxvpn.keystore \
+            --ks-key-alias phxvpn \
+            --ks-pass pass:phxvpn123 \
+            --key-pass pass:phxvpn123 \
+            --out ui/build/outputs/apk/release/phxvpn.apk \
+            ui/build/outputs/apk/release/ui-release-unsigned.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: ui/build/outputs/apk/release/ui-release-aligned.apk
+          path: ui/build/outputs/apk/release/phxvpn.apk
