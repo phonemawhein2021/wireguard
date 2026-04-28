@@ -1,92 +1,22 @@
-@file:Suppress("UnstableApiUsage")
-
-val pkg: String = providers.gradleProperty("wireguardPackageName").get()
-
-plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.legacy.kapt)
-}
-
 android {
-    compileSdk = 36
-    buildFeatures {
-        buildConfig = true
-        dataBinding = true
-        viewBinding = true
-    }
-    namespace = pkg
-    defaultConfig {
-        applicationId = pkg
-        minSdk = 24
-        versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
-        versionName = providers.gradleProperty("wireguardVersionName").get()
-        buildConfigField("int", "MIN_SDK_VERSION", minSdk.toString())
-    }
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a")
-            isUniversalApk = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
+    // ... အခြား configuration များ ...
+
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles("proguard-android-optimize.txt")
-            packaging {
-                resources {
-                    excludes += "DebugProbesKt.bin"
-                    excludes += "kotlin-tooling-metadata.json"
-                    excludes += "META-INF/*.version"
-                }
-            }
-        }
-        debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-        }
-        create("googleplay") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
+            isMinifyEnabled = true // Code တွေကို ချုံ့ပေးတယ်
+            isShrinkResources = true // မသုံးတဲ့ Resource တွေကို ဖယ်ပေးတယ်
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            
+            signingConfig = signingConfigs.getByName("release") // Sign လုပ်ဖို့ ထည့်ပေးရမယ်
         }
     }
-    androidResources {
-        generateLocaleConfig = true
-    }
-    lint {
-        disable += "LongLogTag"
-        warning += "MissingTranslation"
-        warning += "ImpliedQuantity"
-    }
-}
 
-dependencies {
-    implementation(project(":tunnel"))
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.annotation)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.coordinatorlayout)
-    implementation(libs.androidx.biometric)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.preference.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.google.material)
-    implementation(libs.zxing.android.embedded)
-    implementation(libs.kotlinx.coroutines.android)
-    coreLibraryDesugaring(libs.desugarJdkLibs)
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-Xlint:unchecked")
-    options.isDeprecation = true
+    splits {
+        abi {
+            isEnable = true // ခွဲထုတ်ဖို့ ဖွင့်ပေးတာ
+            reset()
+            include("arm64-v8a", "armeabi-v7a") // ဒီနှစ်ခုပဲ ထုတ်မယ်
+            isUniversalApk = false // ဖိုင်အားလုံးပေါင်းထားတဲ့ ဖိုင်ကြီး မထုတ်ဘူး (Size သေးစေဖို့)
+        }
+    }
 }
