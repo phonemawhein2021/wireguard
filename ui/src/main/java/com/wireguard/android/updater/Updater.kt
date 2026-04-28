@@ -368,8 +368,7 @@ object Updater {
     }
 
     fun monitorForUpdates() {
-        if (BuildConfig.DEBUG)
-            return
+    return
 
         val context = Application.get()
 
