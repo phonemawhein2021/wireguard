@@ -34,19 +34,22 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
-      - name: Sign and align APK
+      - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
-          ${BUILD_TOOLS}/apksigner sign \
-            --ks phxvpn.keystore \
-            --ks-key-alias phxvpn \
-            --ks-pass pass:phxvpn123 \
-            --key-pass pass:phxvpn123 \
-            --out ui/build/outputs/apk/release/phxvpn.apk \
-            ui/build/outputs/apk/release/ui-release-unsigned.apk
+          for apk in ui/build/outputs/apk/release/*-unsigned.apk; do
+            abi=$(basename "$apk" | grep -oE 'arm64-v8a|armeabi-v7a')
+            ${BUILD_TOOLS}/apksigner sign \
+              --ks phxvpn.keystore \
+              --ks-key-alias phxvpn \
+              --ks-pass pass:phxvpn123 \
+              --key-pass pass:phxvpn123 \
+              --out ui/build/outputs/apk/release/phxvpn-${abi}.apk \
+              "$apk"
+          done
 
-      - name: Upload APK
+      - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: ui/build/outputs/apk/release/phxvpn.apk
+          name: release-apks
+          path: ui/build/outputs/apk/release/phxvpn-*.apk
