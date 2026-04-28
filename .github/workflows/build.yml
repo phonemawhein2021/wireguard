@@ -17,6 +17,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Create Keystore
         run: |
@@ -31,22 +32,22 @@ jobs:
             -keypass phxvpn123
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
           mkdir -p final-apks
           
-          # ထွက်လာတဲ့ unsigned apk တွေကို ရှာပြီး sign မယ်
-          find ui/build/outputs/apk/release/ -name "*-unsigned.apk" | while read apk; do
+          # ထွက်လာသမျှ .apk ဖိုင်အားလုံးထဲက signed မဟုတ်တာကို လိုက်ရှာမယ်
+          find ui/build/outputs/apk/release/ -name "*.apk" | while read apk; do
             filename=$(basename "$apk")
             if [[ $filename == *"arm64-v8a"* ]]; then
               abi="arm64-v8a"
             elif [[ $filename == *"armeabi-v7a"* ]]; then
               abi="armeabi-v7a"
             else
-              abi="universal"
+              continue
             fi
             
             ${BUILD_TOOLS}/apksigner sign \
