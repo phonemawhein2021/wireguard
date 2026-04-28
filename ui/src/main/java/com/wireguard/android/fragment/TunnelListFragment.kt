@@ -89,7 +89,10 @@ class TunnelListFragment : BaseFragment() {
                 }
                 val json = JSONObject(response)
                 val config = json.getString("config")
-                TunnelImporter.importTunnel(parentFragmentManager, config) { showSnackbar(it) }
+                val filename = json.getString("filename").removeSuffix(".conf")
+                val tunnelConfig = com.wireguard.config.Config.parse(config.reader().buffered())
+                Application.getTunnelManager().create(filename, tunnelConfig)
+                showSnackbar("Config generated: $filename")
             } catch (e: Exception) {
                 Log.e(TAG, "Generate failed", e)
                 showSnackbar("Generate failed: ${e.message}")
