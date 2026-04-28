@@ -19,11 +19,34 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Generate Keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore phxvpn.keystore \
+            -alias phxvpn \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=PHX VPN, OU=PHX, O=PHX, L=MM, S=MM, C=MM" \
+            -storepass phxvpn123 \
+            -keypass phxvpn123
+
       - name: Build Release APK
         run: ./gradlew assembleRelease
+
+      - name: Sign APK
+        run: |
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore phxvpn.keystore \
+            -storepass phxvpn123 \
+            -keypass phxvpn123 \
+            ui/build/outputs/apk/release/ui-release-unsigned.apk \
+            phxvpn
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: ui/build/outputs/apk/release/*.apk
+          path: ui/build/outputs/apk/release/ui-release-unsigned.apk
