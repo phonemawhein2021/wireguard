@@ -4,7 +4,6 @@
  */
 package com.wireguard.android.fragment
 
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
@@ -28,7 +27,6 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.wireguard.android.Application
 import com.wireguard.android.R
-import com.wireguard.android.activity.TunnelCreatorActivity
 import com.wireguard.android.databinding.ObservableKeyedRecyclerViewAdapter.RowConfigurationHandler
 import com.wireguard.android.databinding.TunnelListFragmentBinding
 import com.wireguard.android.databinding.TunnelListItemBinding
@@ -42,10 +40,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.net.URL
 
-/**
- * Fragment containing a list of known WireGuard tunnels. It allows creating and deleting tunnels.
- */
 class TunnelListFragment : BaseFragment() {
     private val actionModeListener = ActionModeListener()
     private var actionMode: ActionMode? = null
@@ -83,6 +80,23 @@ class TunnelListFragment : BaseFragment() {
 
     private val snackbarUpdateShower = SnackbarUpdateShower(this)
 
+    fun onGenerateClicked() {
+        lifecycleScope.launch {
+            try {
+                showSnackbar("Generating config...")
+                val response = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    URL("https://itugyi.netlify.app/.netlify/functions/generate").readText()
+                }
+                val json = JSONObject(response)
+                val config = json.getString("config")
+                TunnelImporter.importTunnel(parentFragmentManager, config) { showSnackbar(it) }
+            } catch (e: Exception) {
+                Log.e(TAG, "Generate failed", e)
+                showSnackbar("Generate failed: ${e.message}")
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState != null) {
@@ -99,32 +113,9 @@ class TunnelListFragment : BaseFragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = TunnelListFragmentBinding.inflate(inflater, container, false)
-        val bottomSheet = AddTunnelsSheet()
         binding?.apply {
             createFab.setOnClickListener {
-                if (childFragmentManager.findFragmentByTag("BOTTOM_SHEET") != null)
-                    return@setOnClickListener
-                childFragmentManager.setFragmentResultListener(AddTunnelsSheet.REQUEST_KEY_NEW_TUNNEL, viewLifecycleOwner) { _, bundle ->
-                    when (bundle.getString(AddTunnelsSheet.REQUEST_METHOD)) {
-                        AddTunnelsSheet.REQUEST_CREATE -> {
-                            startActivity(Intent(requireActivity(), TunnelCreatorActivity::class.java))
-                        }
-
-                        AddTunnelsSheet.REQUEST_IMPORT -> {
-                            tunnelFileImportResultLauncher.launch("*/*")
-                        }
-
-                        AddTunnelsSheet.REQUEST_SCAN -> {
-                            qrImportResultLauncher.launch(
-                                ScanOptions()
-                                    .setOrientationLocked(false)
-                                    .setBeepEnabled(false)
-                                    .setPrompt(getString(R.string.qr_code_hint))
-                            )
-                        }
-                    }
-                }
-                bottomSheet.showNow(childFragmentManager, "BOTTOM_SHEET")
+                onGenerateClicked()
             }
             executePendingBindings()
             snackbarUpdateShower.attach(mainContainer, createFab)
@@ -303,9 +294,7 @@ class TunnelListFragment : BaseFragment() {
         }
 
         private fun updateTitle(mode: ActionMode?) {
-            if (mode == null) {
-                return
-            }
+            if (mode == null) return
             val count = checkedItems.size
             if (count == 0) {
                 mode.title = ""
@@ -320,13 +309,10 @@ class TunnelListFragment : BaseFragment() {
                 context, if (show) R.anim.scale_up else R.anim.scale_down
             )
             animation.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationRepeat(animation: Animation?) {
-                }
-
+                override fun onAnimationRepeat(animation: Animation?) {}
                 override fun onAnimationEnd(animation: Animation?) {
                     if (!show) view.visibility = View.GONE
                 }
-
                 override fun onAnimationStart(animation: Animation?) {
                     if (show) view.visibility = View.VISIBLE
                 }
