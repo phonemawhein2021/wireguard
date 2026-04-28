@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-// ၁။ ဒီ Plugins block က အသက်ပဲ၊ ဒါမှ android ဆိုတာကို သိမှာပါ
+// အရေးကြီးဆုံးအပိုင်း- ဒီ plugins block က အပေါ်ဆုံးမှာ ရှိရပါမယ်
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    // သင့် app ရဲ့ package name ကို providers ကနေ ဆွဲယူမယ်
+    // ၎င်း namespace သည် သင့် app ၏ မူရင်း package name ဖြစ်ရပါမည်
     namespace = providers.gradleProperty("wireguardPackageName").get()
     compileSdk = 35
 
@@ -18,8 +18,6 @@ android {
         targetSdk = 35
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
-        
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -30,7 +28,6 @@ android {
         }
     }
 
-    // ၂။ arm64 နဲ့ armv7 ခွဲထုတ်တဲ့အပိုင်း
     splits {
         abi {
             isEnable = true
@@ -55,8 +52,9 @@ android {
 
 dependencies {
     implementation(project(":tunnel"))
-    // ကျန်တဲ့ implementation library များကို သင့်မူရင်းဖိုင်အတိုင်း ဒီအောက်မှာ ဆက်ထည့်ပေးပါ
+    // အောက်ပါတို့သည် အခြေခံ library များဖြစ်သည်၊ သင့်မူရင်းဖိုင်ထဲက dependencies များကိုလည်း ဒီအောက်မှာ ဆက်ထည့်နိုင်သည်
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
