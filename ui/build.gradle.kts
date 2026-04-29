@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = providers.gradleProperty("wireguardPackageName").get()
-    compileSdk = 36 // tunnel module နှင့် ကိုက်ညီအောင် ၃၆ သို့ ပြောင်းထားသည်
+    [span_4](start_span)compileSdk = 36 // အရေးကြီးသည်- ၃၆ ဖြစ်ရပါမည်[span_4](end_span)
 
     defaultConfig {
         applicationId = namespace
         minSdk = 24
-        targetSdk = 36 
+        [span_5](start_span)targetSdk = 36 // ၃၅ မှ ၃၆ သို့ ပြောင်းလဲထားသည်[span_5](end_span)
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
     }
@@ -49,12 +49,10 @@ android {
 
 dependencies {
     implementation(project(":tunnel"))
-    
     implementation(libs.androidx.appcompat)
     implementation(libs.google.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    
     coreLibraryDesugaring(libs.desugarJdkLibs)
 }
