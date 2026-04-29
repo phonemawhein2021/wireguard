@@ -21,7 +21,7 @@ object BiometricAuthenticator {
 
     // Not all devices support strong biometric auth so we're allowing both device credentials as
     // well as weak biometrics.
-    private const val allowedAuthenticators = Authenticators.DEVICE_CREDENTIAL or Authenticators.BIOMETRIC_WEAK
+    private val allowedAuthenticators = Authenticators.DEVICE_CREDENTIAL or Authenticators.BIOMETRIC_WEAK
 
     sealed class Result {
         data class Success(val cryptoObject: BiometricPrompt.CryptoObject?) : Result()
