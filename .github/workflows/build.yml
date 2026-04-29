@@ -32,15 +32,14 @@ jobs:
             -keypass phxvpn123
 
       - name: Build with Gradle
-        run: ./gradlew :ui:assembleRelease --no-daemon
+        # [span_7](start_span)clean ထည့်ခြင်းဖြင့် version အဟောင်း error ကို ရှင်းပစ်ပါမည်[span_7](end_span)
+        run: ./gradlew clean :ui:assembleRelease --no-daemon
 
       - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
           mkdir -p final-apks
-          # ထွက်လာတဲ့ APK အားလုံးကို အပြင်ကနေ sign မယ်
-          find ui/build/outputs/apk/release/ -name "*.apk" | \
-          while read apk; do
+          find ui/build/outputs/apk/release/ -name "*.apk" | while read apk; do
             abi=$(basename "$apk" | grep -oE 'arm64-v8a|armeabi-v7a' || echo "universal")
             ${BUILD_TOOLS}/apksigner sign \
               --ks phxvpn.keystore \
