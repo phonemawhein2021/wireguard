@@ -22,7 +22,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // signingConfig အပိုင်းကို လုံးဝ ဖြုတ်ထားရပါမည်
+            // သတိပြုရန်- signingConfig စာကြောင်းကို ဒီနေရာမှာ လုံးဝ မထည့်ရပါ
         }
     }
 
@@ -50,13 +50,10 @@ android {
 
 dependencies {
     implementation(project(":tunnel"))
-    
-    // libs.versions.toml ထဲက အမှန်အတိုင်း ပြန်ခေါ်ထားပါသည်
     implementation(libs.androidx.appcompat)
     implementation(libs.google.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    
     coreLibraryDesugaring(libs.desugarJdkLibs)
 }
