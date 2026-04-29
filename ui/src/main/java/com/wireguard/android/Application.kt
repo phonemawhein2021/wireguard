@@ -51,7 +51,7 @@ class Application : android.app.Application() {
 
     override fun attachBaseContext(context: Context) {
         super.attachBaseContext(context)
-        if (BuildConfig.MIN_SDK_VERSION > Build.VERSION.SDK_INT) {
+        if (Build.VERSION.SDK_INT < 24) {
             val intent = Intent(Intent.ACTION_MAIN)
             intent.addCategory(Intent.CATEGORY_HOME)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
