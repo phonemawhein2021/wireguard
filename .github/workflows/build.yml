@@ -32,7 +32,6 @@ jobs:
             -keypass phxvpn123
 
       - name: Build with Gradle
-        # [span_7](start_span)clean ထည့်ခြင်းဖြင့် version အဟောင်း error ကို ရှင်းပစ်ပါမည်[span_7](end_span)
         run: ./gradlew clean :ui:assembleRelease --no-daemon
 
       - name: Sign APKs
