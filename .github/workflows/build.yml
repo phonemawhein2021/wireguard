@@ -1,12 +1,46 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Create Keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore phxvpn.keystore \
+            -alias phxvpn \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=PHX VPN, OU=PHX, O=PHX, L=MM, S=MM, C=MM" \
+            -storepass phxvpn123 \
+            -keypass phxvpn123
+
+      - name: Build with Gradle
+        run: ./gradlew :ui:assembleRelease --no-daemon
+
       - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
           mkdir -p final-apks
-          
-          # Unsigned APK များကိုသာ ရှာဖွေပြီး sign လုပ်မည်
+          # ထွက်လာတဲ့ APK အားလုံးကို အပြင်ကနေ sign မယ်
           find ui/build/outputs/apk/release/ -name "*.apk" | while read apk; do
             abi=$(basename "$apk" | grep -oE 'arm64-v8a|armeabi-v7a' || echo "universal")
-            
             ${BUILD_TOOLS}/apksigner sign \
               --ks phxvpn.keystore \
               --ks-key-alias phxvpn \
@@ -15,3 +49,9 @@
               --out final-apks/PHX-VPN-${abi}.apk \
               "$apk"
           done
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHX-VPN-Release
+          path: final-apks/*.apk
