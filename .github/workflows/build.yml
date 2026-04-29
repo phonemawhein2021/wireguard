@@ -1,54 +1,11 @@
-name: Build Release APK
-
-on:
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Create Keystore
-        run: |
-          keytool -genkeypair -v \
-            -keystore phxvpn.keystore \
-            -alias phxvpn \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=PHX VPN, OU=PHX, O=PHX, L=MM, S=MM, C=MM" \
-            -storepass phxvpn123 \
-            -keypass phxvpn123
-
-      - name: Build with Gradle
-        run: ./gradlew assembleRelease --no-daemon
-
       - name: Sign APKs
         run: |
           BUILD_TOOLS=${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)
           mkdir -p final-apks
           
-          # ထွက်လာသမျှ .apk ဖိုင်အားလုံးထဲက signed မဟုတ်တာကို လိုက်ရှာမယ်
+          # Unsigned APK များကိုသာ ရှာဖွေပြီး sign လုပ်မည်
           find ui/build/outputs/apk/release/ -name "*.apk" | while read apk; do
-            filename=$(basename "$apk")
-            if [[ $filename == *"arm64-v8a"* ]]; then
-              abi="arm64-v8a"
-            elif [[ $filename == *"armeabi-v7a"* ]]; then
-              abi="armeabi-v7a"
-            else
-              continue
-            fi
+            abi=$(basename "$apk" | grep -oE 'arm64-v8a|armeabi-v7a' || echo "universal")
             
             ${BUILD_TOOLS}/apksigner sign \
               --ks phxvpn.keystore \
@@ -58,9 +15,3 @@ jobs:
               --out final-apks/PHX-VPN-${abi}.apk \
               "$apk"
           done
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: PHX-VPN-Release
-          path: final-apks/*.apk
