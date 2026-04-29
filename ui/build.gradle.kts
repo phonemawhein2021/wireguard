@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = namespace
         minSdk = 24
-        targetSdk = 35 
+        targetSdk = 36 
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
     }
