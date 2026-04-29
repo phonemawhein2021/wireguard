@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = providers.gradleProperty("wireguardPackageName").get()
-    [span_4](start_span)compileSdk = 36 // အရေးကြီးသည်- ၃၆ ဖြစ်ရပါမည်[span_4](end_span)
+    compileSdk = 36
 
     defaultConfig {
         applicationId = namespace
         minSdk = 24
-        [span_5](start_span)targetSdk = 36 // ၃၅ မှ ၃၆ သို့ ပြောင်းလဲထားသည်[span_5](end_span)
+        targetSdk = 36
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
     }
