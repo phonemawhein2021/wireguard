@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = providers.gradleProperty("wireguardPackageName").get()
-    compileSdk = 36
+    compileSdk = 36 // ၃၅ မှ ၃၆ သို့ ပြောင်းလိုက်သည်
 
     defaultConfig {
         applicationId = namespace
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 35 // targetSdk ကိုတော့ ၃၅ ပဲ ထားလို့ရပါတယ်
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
     }
@@ -22,7 +22,6 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // သတိပြုရန်- signingConfig စာကြောင်းကို ဒီနေရာမှာ လုံးဝ မထည့်ရပါ
         }
     }
 
