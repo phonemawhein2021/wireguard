@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = providers.gradleProperty("wireguardPackageName").get()
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = namespace
